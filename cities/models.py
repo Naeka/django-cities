@@ -54,7 +54,7 @@ class Region(models.Model):
         return list
         
     def __unicode__(self):
-        return u'{}, {}'.format(force_unicode(self.name_std), self.parent)    
+        return u'{0}, {1}'.format(force_unicode(self.name_std), self.parent)    
         
 class City(models.Model):
     name = models.CharField(max_length=200, db_index=True, verbose_name="ascii name")
@@ -82,7 +82,7 @@ class City(models.Model):
         return list
         
     def __unicode__(self):
-        return u'{}, {}'.format(force_unicode(self.name_std), self.parent)
+        return u'{0}, {1}'.format(force_unicode(self.name_std), self.parent)
 
 class District(models.Model):
     name = models.CharField(max_length=200, db_index=True, verbose_name="ascii name")
@@ -105,7 +105,7 @@ class District(models.Model):
         return list
         
     def __unicode__(self):
-        return u'{}, {}'.format(force_unicode(self.name_std), self.parent)
+        return u'{0}, {1}'.format(force_unicode(self.name_std), self.parent)
 
 class GeoAltNameManager(models.GeoManager):
     def get_preferred(self, default=None, **kwargs):
@@ -121,7 +121,7 @@ class GeoAltNameManager(models.GeoManager):
 def create_geo_alt_names(geo_type):
     geo_alt_names = {}
     for locale in settings.locales:
-        name_format = geo_type.__name__ + '{}' + locale.capitalize()
+        name_format = geo_type.__name__ + '{0}' + locale.capitalize()
         name = name_format.format('AltName')
         geo_alt_names[locale] = create_model(
             name = name,
@@ -181,7 +181,7 @@ def create_postal_codes():
         
     postal_codes = {}
     for country in settings.postal_codes:
-        name_format = "{}" + country
+        name_format = "{0}" + country
         name = name_format.format('PostalCode')
         postal_codes[country] = create_model(
             name = name,

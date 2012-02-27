@@ -91,7 +91,7 @@ class Command(BaseCommand):
                 web_file = None
                 continue
         else:
-            self.logger.error("Web file not found: {}. Tried URLs:\n{}".format(filename, '\n'.join(urls)))
+            self.logger.error("Web file not found: {0}. Tried URLs:\n{1}".format(filename, '\n'.join(urls)))
             
         uptodate = False
         filepath = os.path.join(self.data_dir, filename)
@@ -161,7 +161,7 @@ class Command(BaseCommand):
             
             if not self.call_hook('country_post', country, items): continue 
             country.save()
-            self.logger.debug("Added country: {}, {}".format(country.code, country))
+            self.logger.debug("Added country: {0}, {1}".format(country.code, country))
 
     def import_region(self):
         self.import_region_0()
@@ -179,7 +179,7 @@ class Command(BaseCommand):
         country_code = region.code.split('.')[0]
         try: region.country = self.country_index[country_code]
         except:
-            self.logger.warning("Region {}: {}: Cannot find country: {} -- skipping".format(level, region.name, country_code))
+            self.logger.warning("Region {0}: {1}: Cannot find country: {2} -- skipping".format(level, region.name, country_code))
             return None
         
         # Find parent region, search highest level first
@@ -189,7 +189,7 @@ class Command(BaseCommand):
                 region.region_parent = self.region_index[region_parent_code]
                 break
             except:
-                self.logger.warning("Region {}: {}: Cannot find region {}: {}".format(level, region.name, sublevel, region_parent_code))
+                self.logger.warning("Region {0}: {1}: Cannot find region {2}: {3}".format(level, region.name, sublevel, region_parent_code))
             
         return region
     
@@ -219,7 +219,7 @@ class Command(BaseCommand):
             
             if not self.call_hook('region_post', 0, region, items): continue
             region.save()
-            self.logger.debug("Added region 0: {}, {}".format(region.code, region))
+            self.logger.debug("Added region 0: {0}, {1}".format(region.code, region))
         
     def build_region_index(self, level=None):
         if hasattr(self, 'region_index') and self.region_index_level == level: return
@@ -228,7 +228,7 @@ class Command(BaseCommand):
             self.logger.info("Building region index")
             qset = Region.objects.all()
         else:
-            self.logger.info("Building region {} index".format(level))
+            self.logger.info("Building region {0} index".format(level))
             qset = Region.objects.filter(level=level)
             
         self.region_index = {}
@@ -255,7 +255,7 @@ class Command(BaseCommand):
             
             if not self.call_hook('region_post', 1, region, items): continue
             region.save()
-            self.logger.debug("Added region 1: {}, {}".format(region.code, region))
+            self.logger.debug("Added region 1: {0}, {1}".format(region.code, region))
         
     def import_city_common(self, city, items):
         class_ = city.__class__
@@ -271,7 +271,7 @@ class Command(BaseCommand):
         country_code = items[8]
         try: country = self.country_index[country_code]
         except:
-            self.logger.warning("{}: {}: Cannot find country: {} -- skipping".format(class_.__name__, city.name, country_code))
+            self.logger.warning("{0}: {1}: Cannot find country: {2} -- skipping".format(class_.__name__, city.name, country_code))
             return None
         if class_ is City: city.country = country
         
@@ -286,7 +286,7 @@ class Command(BaseCommand):
                 break
             except:
                 self.logger.log(logging.DEBUG if level else logging.WARNING, # Escalate if all levels failed
-                                "{}: {}: Cannot find region {}: {}".format(class_.__name__, city.name, level, code))
+                                "{0}: {1}: Cannot find region {2}: {3}".format(class_.__name__, city.name, level, code))
         if class_ is City: city.region = region
         
         return city
@@ -313,7 +313,7 @@ class Command(BaseCommand):
             
             if not self.call_hook('city_post', city, items): continue
             city.save()
-            self.logger.debug("Added city: {}".format(city))
+            self.logger.debug("Added city: {0}".format(city))
         
     def build_hierarchy(self):
         if hasattr(self, 'hierarchy'): return
@@ -360,7 +360,7 @@ class Command(BaseCommand):
             city = None
             try: city = city_index[self.hierarchy[district.id]]
             except:
-                self.logger.warning("District: {}: Cannot find city in hierarchy, using nearest".format(district.name))
+                self.logger.warning("District: {0}: Cannot find city in hierarchy, using nearest".format(district.name))
                 city_pop_min = 100000
                 if connection.ops.mysql:
                     # mysql doesn't have distance function, get nearest city within 2 degrees
@@ -376,13 +376,13 @@ class Command(BaseCommand):
                 else:
                     city = City.objects.filter(population__gt=city_pop_min).distance(district.location).order_by('distance')[0]
             if not city:
-                self.logger.warning("District: {}: Cannot find city -- skipping".format(district.name))
+                self.logger.warning("District: {0}: Cannot find city -- skipping".format(district.name))
                 continue
             district.city = city
             
             if not self.call_hook('district_post', district, items): continue
             district.save()
-            self.logger.debug("Added district: {}".format(district))
+            self.logger.debug("Added district: {0}".format(district))
         
     def import_alt_name(self):
         uptodate = self.download('alt_name')
@@ -424,7 +424,7 @@ class Command(BaseCommand):
             
             if not self.call_hook('alt_name_post', alt, items): continue
             alt.save()
-            self.logger.debug("Added alt name: {}, {} ({})".format(locale, alt, alt.geo))
+            self.logger.debug("Added alt name: {0}, {1} ({2})".format(locale, alt, alt.geo))
             
     def import_postal_code(self):
         uptodate = self.download('postal_code')
@@ -448,7 +448,7 @@ class Command(BaseCommand):
             country = None
             try: country = self.country_index[country_code]
             except:
-                self.logger.warning("Postal code: {}: Cannot find country: {} -- skipping".format(code, country_code))
+                self.logger.warning("Postal code: {0}: Cannot find country: {1} -- skipping".format(code, country_code))
                 continue
             
             pc_type = postal_codes[country_code]
@@ -462,7 +462,7 @@ class Command(BaseCommand):
             
             try: pc.location = Point(float(items[10]), float(items[9]))
             except:
-                self.logger.warning("Postal code: {}, {}: Invalid location ({}, {})".format(pc.country, pc.code, items[10], items[9]))
+                self.logger.warning("Postal code: {0}, {1}: Invalid location ({2}, {3})".format(pc.country, pc.code, items[10], items[9]))
                 pc.location = Point(0,0)
                 
             # Find region, search highest level first
@@ -476,12 +476,12 @@ class Command(BaseCommand):
                     break
                 except:
                     self.logger.log(logging.DEBUG if level else logging.WARNING, # Escalate if all levels failed
-                                    "Postal code: {}, {}: Cannot find region {}: {}".format(pc.country, pc.code, level, code))
+                                    "Postal code: {0}, {1}: Cannot find region {2}: {3}".format(pc.country, pc.code, level, code))
             pc.region = region
         
             if not self.call_hook('postal_code_post', pc, items): continue
             pc.save()
-            self.logger.debug("Added postal code: {}, {}".format(pc.country, pc))
+            self.logger.debug("Added postal code: {0}, {1}".format(pc.country, pc))
             
     def flush_country(self):
         self.logger.info("Flushing country data")
